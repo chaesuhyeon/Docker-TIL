@@ -5,11 +5,9 @@
   "main": "server.js",
   "dependencies": {
     "express": "4.17.1",
-    "redis": "3.0.2",
-    "nodemon": "*"
+    "redis": "3.0.2"
   },
   "scripts": {
-    "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
