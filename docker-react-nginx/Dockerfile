@@ -1,20 +1,20 @@
-# 생성할 이미지의 베이스 이미지 지정
-FROM node:18
+# as는 현재 FROM 부터 다음 FROM 전까지는 모두 builder 단계 라는 것을 명시한다.
+FROM node:alpine as builder
 
-# 작업 디렉토리 지정
-WORKDIR /usr/src/app
+# builder 단계에서 생성도니 파일과 폴더들은 컨테이너에 있는 /usr/src/app/build 디렉터리로 들어간다.
+WORKDIR '/usr/src/app'
 
-# 변경되지 않은 종속성까지 다시 내려받는 문제를 해결하기 위해 package.json 먼저 복사
-COPY package.json ./
+COPY package.json .
 
-# package.json에 명시된 종속성들을 내려받음
 RUN npm install
 
-# 나머지 파일들도 복사
 COPY ./ ./
 
-# 컨테이너가 시작되면 실행할 명령어 작성
-CMD ["npm", "run", "start"]
+RUN npm run build
 
+# nginx 이미지 가져옴
+FROM nginx
 
-#  docker run -p 3000:3000 -v /usr/src/app/node_modules -v ${pwd}:/usr/src/app -t ddd8177/docker-react-app
+# 다른 스테이지에 있는 파일을 복사하기 위해 --from=builder 와 같이 스테이지를 명시, 즉 builder 단계에서 빌드된 파일을 가져오는 것임을 명시
+# 그리고 이 빌드 파일을 컨테이너의 /usr/share/nginx/html 디텍터리로 복사한다. 이 경로는 엔진엑스가 정적 파일을 브라우저에 제공할 수 있게 기본적으로 설정된 장소
+COPY --from=builder /usr/src/app/build /usr/share/nginx/html
