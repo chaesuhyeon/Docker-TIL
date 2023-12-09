@@ -67,16 +67,20 @@ app.get("/people", async (req, res) => {
         res.status(500).json({ message: "Something went wrong." });
     }
 });
-app.listen(3000);
 
-// mongoose.connect(
-//   'mongodb://localhost:27017/swfavorites',
-//   { useNewUrlParser: true },
-//   (err) => {
-//     if (err) {
-//       console.log(err);
-//     } else {
-//       app.listen(3000);
-//     }
-//   }
-// );
+mongoose.connect(
+    // === 로컬 db 접속 ===
+    // host.docker.internal은 도커 컨테이너 내부에서 알 수 있는 호스트 머신(내 로컬 컴퓨터)의 ip 주소로 변환
+    // "mongodb://host.docker.internal:27017/swfavorites",
+
+    // === 컨테이너 db 접속 ===
+    "mongodb://172.17.0.2:27017/swfavorites",
+    { useNewUrlParser: true },
+    (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            app.listen(3000);
+        }
+    }
+);
