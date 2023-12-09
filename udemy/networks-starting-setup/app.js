@@ -74,7 +74,11 @@ mongoose.connect(
     // "mongodb://host.docker.internal:27017/swfavorites",
 
     // === 컨테이너 db 접속 ===
-    "mongodb://172.17.0.2:27017/swfavorites",
+    // "mongodb://172.17.0.2:27017/swfavorites",
+
+    // === 컨테이너 db 접속 > 도커 네트워크 사용===
+    // === ://다음에 오는 mongodb는 컨테이너 명 (docker run -d --name mongodb ~ )===
+    "mongodb://mongodb:27017/swfavorites",
     { useNewUrlParser: true },
     (err) => {
         if (err) {
