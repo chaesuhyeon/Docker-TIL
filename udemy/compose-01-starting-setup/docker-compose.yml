@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  mongodb: # 컨테이너명
+    image: "mongo" # 이미지명
+    volumes:
+      - data:/data/db # 명명된 볼륨
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: su
+    #   MONGO_INITDB_ROOT_PASSWORD: secret
+    # - MONGO_INITDB_ROOT_USERNAME=su # 이런 식으로도 가능
+
+    env_file: # 환경 변수를 파일로 관리하는 경우
+      - ./env/mongo.env
+
+    # 네트워크를 지정할 필요가 없다. 도커 컴포즈를 사용하면 도커가 이 컴포즈 파일에 특정된 모든 서비스에 대해 새 환경을 자동으로 생성하고 모든 서비스를 네트워크에 추가하기 때문
+    # networks:
+    #   - goals-net
+
+  backend: # 컨테이너명
+    build: ./backend # 도커 파일이 있는 디렉터리 (도커파일의 이름이 Dockerfile이면 이 형태로 작성해도 되지만 다르다면 아래 처럼 context와 dockerfile의 이름을 지정해주는 방법을 사용해야한다.)
+    # build:
+    #   context: ./backend # 도커 파일이 있는 디렉터리
+    #   dockerfile: Dockerfile # 도커 파일명 (도커 파일의 이름이 다른 경우 사용 ex.Dockerfile.dev)
+    #   args: # 도커 파일에 전달할 인수 (인수가 있을 경우 이 방식으로 사용할 것)
+    #     some-arg: 1
+    ports:
+      - "80:80"
+    volumes:
+      - logs:/app/logs # 명명된 볼륨
+      - ./backend:/app # 바인드 마운트 볼륨 (원래 /User~~ 로 시작했던 부분이 도커 컴포즈를 사용하면 ./backend 이렇게로 설정 가능)
+      - /app/node_modules # 익명 볼륨
+    env_file:
+      - ./env/backend.env
+    depends_on: # 의존성 설정 (mongodb가 먼저 실행되어야 backend가 실행된다.)
+      - mongodb
+  # frontend: # 컨테이너명
+
+# 도커가 services를 위해 생성해야하는 명명된 볼륨을 인식하기 위해 필요한 구문 (익명 볼륨/ 바인드 마운트 볼륨은 지정할 필요 없음)
+# 다른 서비스에서 동일한 볼륨을 사용하면 그 볼륨이 공유된다.
+volumes:
+  data:
+  logs:
