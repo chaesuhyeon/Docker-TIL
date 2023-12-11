@@ -8,7 +8,7 @@ services:
     #   MONGO_INITDB_ROOT_USERNAME: su
     #   MONGO_INITDB_ROOT_PASSWORD: secret
     # - MONGO_INITDB_ROOT_USERNAME=su # 이런 식으로도 가능
-
+    container_name: mongodb # 컨테이너명 직접 지정
     env_file: # 환경 변수를 파일로 관리하는 경우
       - ./env/mongo.env
 
@@ -33,10 +33,24 @@ services:
       - ./env/backend.env
     depends_on: # 의존성 설정 (mongodb가 먼저 실행되어야 backend가 실행된다.)
       - mongodb
-  # frontend: # 컨테이너명
+  frontend: # 컨테이너명
+    build: ./frontend # 도커 파일이 있는 디렉터리
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/src:/app/src # 바인드 마운트 볼륨
+    stdin_open: true # 개방형 입력 연결이 필요하다는 것을 도커에게 알림 (stdin_open과 tty를 모두 true로 설정해야 한다. 그래야 -it 옵션을 사용할 수 있다. )
+    tty: true # 의사 터미널을 사용하도록 설정
+    depends_on: # 의존성 설정 (backend가 먼저 실행되어야 frontend가 실행된다.)
+      - backend
 
 # 도커가 services를 위해 생성해야하는 명명된 볼륨을 인식하기 위해 필요한 구문 (익명 볼륨/ 바인드 마운트 볼륨은 지정할 필요 없음)
 # 다른 서비스에서 동일한 볼륨을 사용하면 그 볼륨이 공유된다.
 volumes:
   data:
   logs:
+
+
+
+# docker-compose up -d
+# docker-compose down
