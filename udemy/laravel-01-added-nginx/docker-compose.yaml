@@ -1,13 +1,17 @@
 version: "3.8"
-
-services: 
+services: # 6개의 컨테이너 필요(nginx, php, mysql, composer, artisan, npm)
   server:
-    image: 'nginx:stable-alpine'
-    ports: 
-      - '8000:80'
-    volumes: 
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  # php:
+    image: "nginx:stable-alpine"
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # 끝에 적은 ro은 readOnly라는 뜻
+  php:
+    build:
+      context: ./dockerfiles # dockerfile이 있는 경로
+      dockerfile: php.dockerfile # dockerfile 이름
+    volumes:
+      - ./src:/var/www/html:delegated # delegated는 최적화 해주는 옵션
   # mysql:
   # composer:
   # artisan:
