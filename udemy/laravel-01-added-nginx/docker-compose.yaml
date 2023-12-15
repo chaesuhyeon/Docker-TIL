@@ -5,7 +5,8 @@ services: # 6개의 컨테이너 필요(nginx, php, mysql, composer, artisan, np
     ports:
       - "8000:80"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro # 끝에 적은 ro은 readOnly라는 뜻
+      - ./src:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro # 끝에 적은 ro은 readOnly라는 뜻
   php:
     build:
       context: ./dockerfiles # dockerfile이 있는 경로
@@ -14,14 +15,16 @@ services: # 6개의 컨테이너 필요(nginx, php, mysql, composer, artisan, np
       - ./src:/var/www/html:delegated # delegated는 최적화 해주는 옵션
   mysql:
     image: "mysql:5.7"
+    platform: linux/amd64
     env_file:
       - ./env/mysql.env
   composer:
-    build: 
+    build:
       context: ./dockerfiles
       dockerfile: composer.dockerfile
     volumes:
       - ./src:/var/www/html # dockerfile에 정의된 WORDIR( /var/www/html) 경로에 laravel 프로젝트가 생성이 되는데 이를 호스트의 src를 연결
-    
+
+
   # artisan:
   # npm:
