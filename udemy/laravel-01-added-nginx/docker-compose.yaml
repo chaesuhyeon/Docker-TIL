@@ -24,7 +24,14 @@ services: # 6개의 컨테이너 필요(nginx, php, mysql, composer, artisan, np
       dockerfile: composer.dockerfile
     volumes:
       - ./src:/var/www/html # dockerfile에 정의된 WORDIR( /var/www/html) 경로에 laravel 프로젝트가 생성이 되는데 이를 호스트의 src를 연결
-
-
-  # artisan:
-  # npm:
+  artisan: # artisan은 php로 빌드된 laravel 명령어 그래서 php가 필요하다.
+    build:
+      context: ./dockerfiles # dockerfile이 있는 경로
+      dockerfile: php.dockerfile # dockerfile 이름
+    volumes:
+      - ./src:/var/www/html
+    entrypoint: ["php", "/var/www/html/artisan"] # dockerfile에 entrypoint가 없는 경우 오버라이드 하거나 추가할 수 있음
+  npm:
+    image: node:14
+    working_dir: /var/www/html
+    entrypoint: ["npm"]
